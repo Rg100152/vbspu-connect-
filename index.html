@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="VBSPU Connect - Independent Student Portal Demo developed by Raj Gautam (BCA, VBSPU Jaunpur).">
+  <meta name="author" content="Raj Gautam">
+  <title>VBSPU Connect | Independent Student Portal Demo</title>
+  
+  <style>
+    /* ==========================================================================
+       1. CSS Custom Properties & Design Tokens
+       ========================================================================== */
+    :root {
+      --bg-base: #060913;
+      --bg-surface: #0c1222;
+      --bg-surface-elevated: #131c35;
+      --bg-glass: rgba(12, 18, 34, 0.78);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: #00d2ff;
+      
+      --text-main: #f0f4fc;
+      --text-muted: #8fa0be;
+      --text-inverse: #060913;
+      
+      --accent-primary: #0072ff;
+      --accent-secondary: #00d2ff;
+      --accent-gold: #e5b869;
+      --accent-success: #10b981;
+      --accent-warning: #f59e0b;
+      --accent-danger: #ef4444;
+      
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+      --shadow-glow: 0 0 20px rgba(0, 210, 255, 0.2);
+      
+      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      --transition-fast: 0.18s ease;
+      --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f4f7fc;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #e9eef8;
+      --bg-glass: rgba(255, 255, 255, 0.88);
+      --border-subtle: rgba(0, 0, 0, 0.09);
+      --border-focus: #0072ff;
+      
+      --text-main: #0c1222;
+      --text-muted: #53647e;
+      --text-inverse: #ffffff;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.09);
+      --shadow-glow: 0 0 16px rgba(0, 114, 255, 0.15);
+    }
+
+    [data-reduced-motion="true"] * {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+
+    /* ==========================================================================
+       2. Reset & Global Base
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-stack);
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      line-height: 1.55;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--accent-secondary);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+    a:hover { text-decoration: underline; }
+
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 3px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    /* ==========================================================================
+       3. Typography & Badges
+       ========================================================================== */
+    h1, h2, h3, h4 {
+      line-height: 1.25;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      background: rgba(229, 184, 105, 0.15);
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.05em;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+    .tag-exam { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
+    .tag-adm { background: rgba(0, 210, 255, 0.15); color: #7dd3fc; border-color: rgba(0, 210, 255, 0.3); }
+    .tag-acad { background: rgba(16, 185, 129, 0.15); color: #86efac; border-color: rgba(16, 185, 129, 0.3); }
+    .tag-sch { background: rgba(229, 184, 105, 0.15); color: #fde68a; border-color: rgba(229, 184, 105, 0.3); }
+
+    /* ==========================================================================
+       4. Layout: App Frame, Header, Nav Drawer
+       ========================================================================== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .disclaimer-banner {
+      background: linear-gradient(90deg, #1e1b4b, #0f172a);
+      color: #cbd5e1;
+      font-size: 0.75rem;
+      padding: 4px 16px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .brand-emblem {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: #fff;
+      font-size: 1.1rem;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-text span {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quick-search-trigger {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 7px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .quick-search-trigger:hover {
+      border-color: var(--accent-secondary);
+      color: var(--text-main);
+    }
+
+    .nav-toggle-btn {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 1.2rem;
+    }
+
+    /* Mobile Drawer */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-normal);
+    }
+    .drawer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .nav-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(82vw, 320px);
+      background: var(--bg-surface);
+      z-index: 201;
+      transform: translateX(100%);
+      transition: transform var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-md);
+    }
+    .nav-drawer.active {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .drawer-nav-list {
+      list-style: none;
+      padding: 12px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .drawer-nav-item {
+      margin-bottom: 4px;
+    }
+
+    .drawer-nav-btn {
+      width: 100%;
+      text-align: left;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      color: var(--text-muted);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .drawer-nav-btn:hover, .drawer-nav-btn.active {
+      background: var(--bg-surface-elevated);
+      color: var(--accent-secondary);
+    }
+    .drawer-nav-btn.active {
+      font-weight: 700;
+      border-left: 3px solid var(--accent-secondary);
+    }
+
+    /* Main Container */
+    .main-wrapper {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px;
+      flex: 1;
+    }
+
+    /* Views Framework */
+    .view-container {
+      display: none;
+    }
+    .view-container.active {
+      display: block;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       5. Cards, Panels, Buttons & Forms
+       ========================================================================== */
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: transform var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+      border: 1px solid transparent;
+      user-select: none;
+    }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0, 114, 255, 0.35);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 6px 18px rgba(0, 114, 255, 0.5);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border-color: var(--border-subtle);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--text-muted);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .btn-danger:hover {
+      background: var(--accent-danger);
+      color: #fff;
+    }
+
+    .btn-sm { padding: 5px 10px; font-size: 0.78rem; border-radius: var(--radius-sm); }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      transition: border-color var(--transition-fast);
+    }
+    .form-control:focus {
+      border-color: var(--border-focus);
+    }
+
+    /* Grids */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+
+    /* ==========================================================================
+       6. Homepage Hero & Sections
+       ========================================================================== */
+    .hero-banner {
+      background: radial-gradient(circle at 80% 20%, rgba(0, 210, 255, 0.15), transparent 50%),
+                  radial-gradient(circle at 20% 80%, rgba(0, 114, 255, 0.2), transparent 50%),
+                  var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px 20px;
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner h2 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-banner p {
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 20px;
+      font-size: 0.95rem;
+    }
+
+    .quick-nav-pills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    /* ==========================================================================
+       7. Modals & Notifications
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-fast);
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      width: min(92vw, 600px);
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      transform: scale(0.95);
+      transition: transform var(--transition-fast);
+    }
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 10px;
+    }
+
+    /* Toast Stack */
+    .toast-stack {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 400;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: min(90vw, 360px);
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-left: 4px solid var(--accent-secondary);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      font-size: 0.86rem;
+      pointer-events: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      animation: toastIn 0.25s ease-out;
+    }
+    .toast-success { border-left-color: var(--accent-success); }
+    .toast-danger { border-left-color: var(--accent-danger); }
+    .toast-warning { border-left-color: var(--accent-warning); }
+
+    @keyframes toastIn {
+      from { transform: translateY(16px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Print Formatting */
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      .app-header, .drawer-overlay, .nav-drawer, .btn, .no-print, .toast-stack {
+        display: none !important;
+      }
+      .main-wrapper, .panel {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .print-only { display: block !important; }
+    }
+    .print-only { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Disclaimer Banner -->
+  <div class="disclaimer-banner">
+    ⚠️ <strong>DEMO PORTAL:</strong> Independent Student Project for VBSPU Jaunpur by Raj Gautam (BCA). Not an official university service. All academic data is illustrative demo data.
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="nav-container">
+      <div class="brand-wrap" onclick="AppRouter.navigate('home')">
+        <div class="brand-emblem" aria-hidden="true">V</div>
+        <div class="brand-text">
+          <h1>VBSPU Connect <span class="demo-badge">Student Demo</span></h1>
+          <span>Purvanchal University Student Portal</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="quick-search-trigger" onclick="SearchService.openSearchModal()" aria-label="Open search">
+          🔍 <span style="display:none; @media(min-width:600px){display:inline;}">Search...</span> <kbd style="background:var(--bg-base); padding:2px 6px; border-radius:4px; font-size:0.7rem; border:1px solid var(--border-subtle);">Ctrl+K</kbd>
+        </button>
+        <button class="nav-toggle-btn" onclick="AppLayout.toggleDrawer()" aria-label="Toggle navigation menu">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile/Desktop Drawer Navigation -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="AppLayout.toggleDrawer(false)"></div>
+  <aside class="nav-drawer" id="navDrawer" aria-label="Main Navigation">
+    <div class="drawer-header">
+      <div style="font-weight:700; display:flex; align-items:center; gap:8px;">
+        <span style="color:var(--accent-secondary);">✦</span> VBSPU Connect
+      </div>
+      <button onclick="AppLayout.toggleDrawer(false)" aria-label="Close Navigation" style="font-size:1.4rem; padding:4px;">✕</button>
+    </div>
+    <ul class="drawer-nav-list" id="drawerNavList">
+      <!-- Injected dynamically by AppLayout -->
+    </ul>
+    <div style="padding:16px; border-top:1px solid var(--border-subtle); font-size:0.75rem; color:var(--text-muted);">
+      <div>Role: <strong id="currentRoleDisplay">Student (Demo)</strong></div>
+      <div style="margin-top:6px;">Developer: <strong>Raj Gautam</strong></div>
+    </div>
+  </aside>
+
+  <!-- Main Content Space -->
+  <main class="main-wrapper" id="mainContent">
+    
+    <!-- VIEW: HOME -->
+    <section id="view-home" class="view-container">
+      <div class="hero-banner">
+        <h2>Purvanchal University Connect</h2>
+        <p>A unified, responsive student resource portal prototype designed for students of VBSPU Jaunpur.</p>
+        <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="AppRouter.navigate('dashboard')">Open Dashboard</button>
+          <button class="btn btn-secondary" onclick="AppRouter.navigate('results')">Check Results (Demo)</button>
+          <button class="btn btn-secondary" onclick="AppRouter.navigate('notices')">View Notices</button>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:24px;">
+        <div class="panel" style="margin:0;">
+          <h3 style="margin-bottom:8px;">📌 Latest Circulars</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Recent administrative & examination notifications.</p>
+          <div id="homeRecentNotices"></div>
+          <button class="btn btn-secondary btn-sm" style="width:100%; margin-top:12px;" onclick="AppRouter.navigate('notices')">Explore All Notices →</button>
+        </div>
+
+        <div class="panel" style="margin:0;">
+          <h3 style="margin-bottom:8px;">🗓️ Upcoming Examinations</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Illustrative semester schedules & timetable.</p>
+          <div id="homeUpcomingExams"></div>
+          <button class="btn btn-secondary btn-sm" style="width:100%; margin-top:12px;" onclick="AppRouter.navigate('examinations')">View Timetable →</button>
+        </div>
+
+        <div class="panel" style="margin:0;">
+          <h3 style="margin-bottom:8px;">⚡ Quick Services</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Direct tools for academic planning.</p>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="AppRouter.navigate('attendance')">📊 Track Attendance</button>
+            <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="AppRouter.navigate('fees')">💰 Fee Calculator</button>
+            <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="AppRouter.navigate('library')">📚 Library Catalogue</button>
+            <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="AppRouter.navigate('admin')">⚙️ Demo Admin Panel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:12px;">🏛️ University Academic Faculties</h3>
+        <div class="grid-4" id="homeFacultiesGrid"></div>
+      </div>
+    </section>
+
+    <!-- VIEW: DASHBOARD -->
+    <section id="view-dashboard" class="view-container">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+        <div>
+          <h2>Student Dashboard <span class="demo-badge">Demo Data</span></h2>
+          <span style="color:var(--text-muted); font-size:0.85rem;">Welcome back, Raj Gautam (BCA Semester IV)</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <select id="dashboardSemSelector" class="form-control" style="width:auto; padding:6px 12px;" onchange="DashboardView.render()">
+            <option value="4">Semester IV (Active)</option>
+            <option value="3">Semester III</option>
+            <option value="2">Semester II</option>
+            <option value="1">Semester I</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-4" style="margin-bottom:20px;" id="dashboardStatsRow">
+        <!-- Rendered by DashboardView -->
+      </div>
+
+      <div class="grid-2">
+        <div class="panel" style="margin:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3>📊 Attendance Overview</h3>
+            <button class="btn btn-secondary btn-sm" onclick="AppRouter.navigate('attendance')">Details</button>
+          </div>
+          <div id="dashboardAttendancePreview"></div>
+        </div>
+
+        <div class="panel" style="margin:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3>📝 Assignments Tracker</h3>
+            <span class="tag">Active Semester</span>
+          </div>
+          <div id="dashboardAssignmentList"></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:20px;">
+        <h3 style="margin-bottom:12px;">⏱️ Recent Activity & Academic Timeline</h3>
+        <div id="dashboardActivityTimeline" style="border-left: 2px solid var(--border-subtle); margin-left: 10px; padding-left: 16px;">
+          <!-- Injected -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: NOTICES -->
+    <section id="view-notices" class="view-container">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <h2>Notices & Announcements <span class="demo-badge">Sample Notices</span></h2>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Stay updated with university circulars, exam dates, and advisories.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="NoticeView.openCreateModal()">+ Add Demo Notice</button>
+      </div>
+
+      <div class="panel" style="padding:14px; margin-bottom:16px;">
+        <div class="grid-3" style="gap:10px;">
+          <input type="text" id="noticeSearchInput" class="form-control" placeholder="Search notices by keyword..." oninput="NoticeView.applyFilters()">
+          <select id="noticeCategoryFilter" class="form-control" onchange="NoticeView.applyFilters()">
+            <option value="all">All Categories</option>
+            <option value="Examination">Examination</option>
+            <option value="Admission">Admission</option>
+            <option value="Academic">Academic</option>
+            <option value="Scholarship">Scholarship</option>
+            <option value="General">General</option>
+          </select>
+          <select id="noticeSortFilter" class="form-control" onchange="NoticeView.applyFilters()">
+            <option value="newest">Sort: Newest First</option>
+            <option value="oldest">Sort: Oldest First</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="noticesListContainer" class="grid-2">
+        <!-- Rendered by NoticeView -->
+      </div>
+    </section>
+
+    <!-- VIEW: COURSES -->
+    <section id="view-courses" class="view-container">
+      <div style="margin-bottom:16px;">
+        <h2>Course & Syllabus Explorer <span class="demo-badge">Illustrative Catalog</span></h2>
+        <p style="font-size:0.85rem; color:var(--text-muted);">Browse university faculties, departments, and course curricula.</p>
+      </div>
+
+      <div class="panel" style="padding:14px; margin-bottom:16px;">
+        <div class="grid-3" style="gap:10px;">
+          <input type="text" id="courseSearchInput" class="form-control" placeholder="Search courses or subjects..." oninput="CourseView.applyFilters()">
+          <select id="courseFacultyFilter" class="form-control" onchange="CourseView.applyFilters()">
+            <option value="all">All Faculties</option>
+            <option value="Computer Applications">Computer Applications</option>
+            <option value="Engineering & Tech">Engineering & Technology</option>
+            <option value="Science">Faculty of Science</option>
+            <option value="Management Studies">Management Studies</option>
+            <option value="Arts & Humanities">Arts & Humanities</option>
+          </select>
+          <select id="courseLevelFilter" class="form-control" onchange="CourseView.applyFilters()">
+            <option value="all">All Levels</option>
+            <option value="UG">Undergraduate (UG)</option>
+            <option value="PG">Postgraduate (PG)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="coursesGridContainer" class="grid-3">
+        <!-- Rendered by CourseView -->
+      </div>
+    </section>
+
+    <!-- VIEW: EXAMINATIONS -->
+    <section id="view-examinations" class="view-container">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+        <div>
+          <h2>Examination Timetable <span class="demo-badge">Illustrative Schedule</span></h2>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Sample schedule for Semester Examinations. Check official university notifications for real dates.</p>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="ExamView.exportCSV()">Export CSV</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.print()">Print Timetable</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.9rem;" id="examTimetable">
+            <thead>
+              <tr style="border-bottom:2px solid var(--border-subtle); text-align:left; color:var(--text-muted);">
+                <th style="padding:10px;">Date & Time</th>
+                <th style="padding:10px;">Course</th>
+                <th style="padding:10px;">Paper Code</th>
+                <th style="padding:10px;">Subject Title</th>
+                <th style="padding:10px;">Shift</th>
+                <th style="padding:10px;">Countdown</th>
+              </tr>
+            </thead>
+            <tbody id="examTimetableBody">
+              <!-- Rendered by ExamView -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:12px;">✅ Exam Preparation Checklist</h3>
+        <div id="examChecklistContainer" style="display:flex; flex-direction:column; gap:8px;">
+          <!-- Injected -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: RESULTS -->
+    <section id="view-results" class="view-container">
+      <div style="margin-bottom:16px;">
+        <h2>Check Examination Results <span class="demo-badge">Fictional Demo Records</span></h2>
+        <p style="font-size:0.85rem; color:var(--text-muted);">Illustrative marksheet verification system. Demonstrates client-side score computation.</p>
+      </div>
+
+      <div class="panel">
+        <form id="resultQueryForm" onsubmit="ResultView.handleSearch(event)">
+          <div class="grid-3" style="gap:12px;">
+            <div class="form-group" style="margin:0;">
+              <label for="resRoll">Roll Number (Try: 21098101, 21098102)</label>
+              <input type="text" id="resRoll" class="form-control" placeholder="e.g. 21098101" required>
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label for="resCourse">Course</label>
+              <select id="resCourse" class="form-control">
+                <option value="BCA">Bachelor of Computer Applications (BCA)</option>
+                <option value="BTECH">B.Tech (Computer Science)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label for="resSem">Semester</label>
+              <select id="resSem" class="form-control">
+                <option value="3">Semester III</option>
+                <option value="2">Semester II</option>
+                <option value="1">Semester I</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:14px; display:flex; gap:10px;">
+            <button type="submit" class="btn btn-primary">Find Result Record</button>
+            <button type="button" class="btn btn-secondary" onclick="ResultView.loadDemoSample()">Fill Demo Sample</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="resultOutputContainer"></div>
+    </section>
+
+    <!-- VIEW: ATTENDANCE -->
+    <section id="view-attendance" class="view-container">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+        <div>
+          <h2>Attendance Tracker <span class="demo-badge">Personal Demo Logger</span></h2>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Monitor and simulate your classroom presence against the recommended 75% threshold.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="AttendanceView.openAddModal()">+ Add Subject Record</button>
+      </div>
+
+      <div class="grid-3" id="attendanceSummaryCards" style="margin-bottom:20px;">
+        <!-- Injected -->
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:14px;">Subject Breakdown</h3>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+            <thead>
+              <tr style="border-bottom:2px solid var(--border-subtle); text-align:left; color:var(--text-muted);">
+                <th style="padding:10px;">Subject</th>
+                <th style="padding:10px;">Attended</th>
+                <th style="padding:10px;">Conducted</th>
+                <th style="padding:10px;">Percentage</th>
+                <th style="padding:10px;">Status</th>
+                <th style="padding:10px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceTableBody">
+              <!-- Injected -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: FEES -->
+    <section id="view-fees" class="view-container">
+      <div style="margin-bottom:16px;">
+        <h2>Fee Calculator & Scholarship Guide <span class="demo-badge">Illustrative Planner</span></h2>
+        <p style="font-size:0.85rem; color:var(--text-muted);">Estimate semester expenses and review Uttar Pradesh post-matric scholarship criteria.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h3 style="margin-bottom:14px;">Semester Fee Estimator</h3>
+          <div id="feeCalculatorForm">
+            <div class="form-group">
+              <label>Tuition Fee (₹)</label>
+              <input type="number" id="feeTuition" class="form-control" value="22000" oninput="FeeView.calculate()">
+            </div>
+            <div class="form-group">
+              <label>Examination Fee (₹)</label>
+              <input type="number" id="feeExam" class="form-control" value="2500" oninput="FeeView.calculate()">
+            </div>
+            <div class="form-group">
+              <label>Library & Lab Fee (₹)</label>
+              <input type="number" id="feeLab" class="form-control" value="3500" oninput="FeeView.calculate()">
+            </div>
+            <div class="form-group">
+              <label>Development & Student Fund (₹)</label>
+              <input type="number" id="feeDev" class="form-control" value="1500" oninput="FeeView.calculate()">
+            </div>
+            <div class="form-group">
+              <label>Amount Already Paid (₹)</label>
+              <input type="number" id="feePaid" class="form-control" value="15000" oninput="FeeView.calculate()">
+            </div>
+            
+            <div style="background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-md); margin-top:16px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span>Total Fee:</span>
+                <strong id="feeTotalDisplay">₹0</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span>Total Paid:</span>
+                <span id="feePaidDisplay" style="color:var(--accent-success);">₹0</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:1.1rem; border-top:1px solid var(--border-subtle); padding-top:8px;">
+                <strong>Balance Due:</strong>
+                <strong id="feeDueDisplay" style="color:var(--accent-secondary);">₹0</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3 style="margin-bottom:14px;">UP State Scholarship Checklist</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Standard documentary prerequisites for UP Post Matric Scholarship scheme submission:</p>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; font-size:0.88rem;">
+            <li>✓ Domicile Certificate (Uttar Pradesh)</li>
+            <li>✓ Caste Certificate (SC/ST/OBC/EWS if applicable)</li>
+            <li>✓ Income Certificate (Annual family income threshold as per norms)</li>
+            <li>✓ High School & Intermediate Marksheets</li>
+            <li>✓ Previous Year Marksheet with minimum qualifying percentage</li>
+            <li>✓ Aadhaar Card linked with active NPCI bank account</li>
+            <li>✓ University Fee Receipt & Allotment Letter</li>
+          </ul>
+          <div style="margin-top:16px; padding:12px; background:var(--bg-base); border-radius:var(--radius-md); font-size:0.8rem; color:var(--text-muted);">
+            Note: Application submissions occur exclusively via the official UP scholarship portal (scholarship.up.gov.in). This portal does not process transactions.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: LIBRARY -->
+    <section id="view-library" class="view-container">
+      <div style="margin-bottom:16px;">
+        <h2>Academic Library Catalogue <span class="demo-badge">Sample Repository</span></h2>
+        <p style="font-size:0.85rem; color:var(--text-muted);">Explore recommended textbooks, reference materials, and computer science resources.</p>
+      </div>
+
+      <div class="panel" style="padding:14px; margin-bottom:16px;">
+        <div class="grid-2" style="gap:10px;">
+          <input type="text" id="libSearchInput" class="form-control" placeholder="Search by book title, author or subject..." oninput="LibraryView.applyFilters()">
+          <select id="libCategoryFilter" class="form-control" onchange="LibraryView.applyFilters()">
+            <option value="all">All Departments</option>
+            <option value="Computer Science">Computer Science & IT</option>
+            <option value="Mathematics">Discrete Mathematics</option>
+            <option value="Management">Management & Accounting</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="libraryBooksContainer" class="grid-3">
+        <!-- Injected -->
+      </div>
+    </section>
+
+    <!-- VIEW: PROFILE & SETTINGS -->
+    <section id="view-profile" class="view-container">
+      <div style="margin-bottom:16px;">
+        <h2>Student Profile & Settings <span class="demo-badge">Client Preferences</span></h2>
+        <p style="font-size:0.85rem; color:var(--text-muted);">Personalize your demo session and manage localized application storage.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h3 style="margin-bottom:14px;">Demo Profile Details</h3>
+          <form id="profileEditForm" onsubmit="ProfileView.saveProfile(event)">
+            <div class="form-group">
+              <label>Student Full Name</label>
+              <input type="text" id="profName" class="form-control" value="Raj Gautam" required>
+            </div>
+            <div class="form-group">
+              <label>Enrollment / Roll Number</label>
+              <input type="text" id="profRoll" class="form-control" value="21098101" required>
+            </div>
+            <div class="form-group">
+              <label>Course & Specialization</label>
+              <input type="text" id="profCourse" class="form-control" value="Bachelor of Computer Applications (BCA)" required>
+            </div>
+            <div class="form-group">
+              <label>Affiliated College / Campus</label>
+              <input type="text" id="profCollege" class="form-control" value="VBSPU Main Campus, Jaunpur" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Local Profile</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h3 style="margin-bottom:14px;">Display & Accessibility</h3>
+          <div class="form-group">
+            <label>Color Theme</label>
+            <select id="settingTheme" class="form-control" onchange="ThemeManager.setTheme(this.value)">
+              <option value="dark">Midnight Dark (Default)</option>
+              <option value="light">Crisp Light</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Motion Preferences</label>
+            <select id="settingMotion" class="form-control" onchange="ThemeManager.setReducedMotion(this.value === 'true')">
+              <option value="false">Standard Transitions</option>
+              <option value="true">Reduced Motion</option>
+            </select>
+          </div>
+
+          <h3 style="margin-top:20px; margin-bottom:12px;">Local Data Operations</h3>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <button class="btn btn-secondary" onclick="StorageManager.exportJSON()">Export Personal Data (JSON)</button>
+            <button class="btn btn-danger" onclick="StorageManager.resetAllData()">Reset All Local Application Data</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: ADMIN DEMO PANEL -->
+    <section id="view-admin" class="view-container">
+      <div style="margin-bottom:16px;">
+        <h2>Demonstration Administration Console <span class="demo-badge">Demo Role Preview</span></h2>
+        <p style="font-size:0.85rem; color:var(--text-muted);">Simulated administrative controls. This interface showcases how university content managers would operate with persistent localStorage.</p>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:20px;">
+        <div class="panel" style="margin:0;">
+          <h4>Active Notices</h4>
+          <p style="font-size:1.8rem; font-weight:800; color:var(--accent-secondary);" id="adminNoticeCount">0</p>
+        </div>
+        <div class="panel" style="margin:0;">
+          <h4>Total Courses</h4>
+          <p style="font-size:1.8rem; font-weight:800; color:var(--accent-primary);" id="adminCourseCount">0</p>
+        </div>
+        <div class="panel" style="margin:0;">
+          <h4>Exam Papers</h4>
+          <p style="font-size:1.8rem; font-weight:800; color:var(--accent-gold);" id="adminExamCount">0</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3>Manage Sample Notices</h3>
+          <button class="btn btn-primary btn-sm" onclick="NoticeView.openCreateModal()">+ Create Notice</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+            <thead>
+              <tr style="border-bottom:2px solid var(--border-subtle); text-align:left; color:var(--text-muted);">
+                <th style="padding:10px;">Title</th>
+                <th style="padding:10px;">Category</th>
+                <th style="padding:10px;">Date</th>
+                <th style="padding:10px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminNoticesTableBody">
+              <!-- Injected -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: HELP & FAQ -->
+    <section id="view-help" class="view-container">
+      <div style="margin-bottom:16px;">
+        <h2>Help Center & Documentation <span class="demo-badge">Student Guide</span></h2>
+        <p style="font-size:0.85rem; color:var(--text-muted);">Frequently asked questions and accessibility navigation guide.</p>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:12px;">Keyboard Accessibility</h3>
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">Navigate VBSPU Connect efficiently using these keyboard shortcuts:</p>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:6px; font-size:0.85rem;">
+          <li><kbd>Ctrl</kbd> + <kbd>K</kbd> : Open Instant Global Search</li>
+          <li><kbd>Escape</kbd> : Close open modal windows and mobile menus</li>
+          <li><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> : Cycle accessible focus elements</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:14px;">Frequently Asked Questions</h3>
+        <div style="display:flex; flex-direction:column; gap:12px;" id="helpFaqContainer">
+          <!-- Injected -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: ABOUT DEVELOPER -->
+    <section id="view-developer" class="view-container">
+      <div class="panel" style="max-width:800px; margin:0 auto;">
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+          <div style="width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); display:grid; place-items:center; font-size:1.8rem; font-weight:800; color:#fff;">
+            RG
+          </div>
+          <div>
+            <h2 style="font-size:1.4rem;">Raj Gautam</h2>
+            <div style="color:var(--accent-secondary); font-size:0.9rem; font-weight:600;">BCA Student | VBSPU Jaunpur</div>
+            <div style="color:var(--text-muted); font-size:0.8rem;">Independent Frontend Developer</div>
+          </div>
+        </div>
+
+        <p style="font-size:0.95rem; margin-bottom:16px; color:var(--text-muted);">
+          "An academic frontend project exploring responsive web design, vanilla JavaScript, user interface development and educational technology."
+        </p>
+
+        <div style="background:var(--bg-base); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-bottom:16px;">
+          <h4 style="margin-bottom:8px;">Project Specifications</h4>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:6px; font-size:0.85rem; color:var(--text-muted);">
+            <li>• <strong>Architecture:</strong> Single-File Modular Vanilla Architecture (HTML5, Modern CSS3, ES6+)</li>
+            <li>• <strong>Zero Third-Party Dependencies:</strong> Completely self-sufficient and network resilient</li>
+            <li>• <strong>GitHub Repository Profile:</strong> <a href="https://github.com/Rg100152" target="_blank" rel="noopener noreferrer">https://github.com/Rg100152</a></li>
+            <li>• <strong>Target Audience:</strong> Students and faculties of Purvanchal University exploring modern web UX</li>
+          </ul>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <a href="https://github.com/Rg100152" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            Visit GitHub Profile (@Rg100152) ↗
+          </a>
+          <button class="btn btn-secondary" onclick="AppRouter.navigate('home')">Return Home</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Global Modals -->
+  <!-- Search Modal -->
+  <div class="modal-overlay" id="searchModal" onclick="SearchService.handleBackdropClick(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Global System Search</h3>
+        <button onclick="SearchService.closeSearchModal()" aria-label="Close search">✕</button>
+      </div>
+      <input type="text" id="globalSearchInput" class="form-control" placeholder="Search notices, courses, subjects, books..." oninput="SearchService.executeSearch(this.value)">
+      <div id="searchResultsList" style="margin-top:14px; max-height:350px; overflow-y:auto;">
+        <div style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding:20px;">
+          Type anything to search across all portal data...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notice Detail & Edit Modal -->
+  <div class="modal-overlay" id="noticeModal" onclick="NoticeView.handleBackdropClick(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="noticeModalTitle">Notice Details</h3>
+        <button onclick="NoticeView.closeModal()">✕</button>
+      </div>
+      <div id="noticeModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-stack" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Footer -->
+  <footer style="background:var(--bg-surface); border-top:1px solid var(--border-subtle); padding:24px 16px; margin-top:auto; font-size:0.82rem; color:var(--text-muted);">
+    <div style="max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <strong>VBSPU Connect</strong> — Conceived and engineered by <strong>Raj Gautam</strong> (BCA Student, VBSPU Jaunpur).
+        <div style="font-size:0.75rem; margin-top:2px;">Independent Student Project. Not affiliated with official Veer Bahadur Singh Purvanchal University administration.</div>
+      </div>
+      <div>
+        <a href="https://github.com/Rg100152" target="_blank" rel="noopener noreferrer" style="color:var(--accent-secondary); font-weight:600;">
+          GitHub: @Rg100152
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       8. JavaScript Modular Architecture
+       ========================================================================== -->
+  <script>
+    'use strict';
+
+    /* ==========================================================================
+       State & Data Repositories
+       ========================================================================== */
+    const DataRepository = {
+      defaultNotices: [
+        {
+          id: 'not-01',
+          title: 'Notice regarding BCA & B.Tech Even Semester Examination Form 2026',
+          category: 'Examination',
+          date: '2026-04-10',
+          content: 'All regular and back-paper students of BCA and B.Tech are informed to submit their semester examination forms through their respective college portals before the announced deadline. Verify roll records with academic clerk.',
+          isUserCreated: false
+        },
+        {
+          id: 'not-02',
+          title: 'Campus Placement Drive by Leading Regional IT Solutions',
+          category: 'Academic',
+          date: '2026-04-05',
+          content: 'The Training & Placement Cell announces an upcoming placement drive for final year BCA, MCA, and B.Tech scholars. Eligible candidates must verify profile marks and submit resume at the department office.',
+          isUserCreated: false
+        },
+        {
+          id: 'not-03',
+          title: 'UP Post-Matric Scholarship Biometric Verification Advisory',
+          category: 'Scholarship',
+          date: '2026-03-28',
+          content: 'Students eligible for state scholarship disbursements must complete mandatory Aadhaar e-KYC and biometric attendance registration at the university administrative block window 4.',
+          isUserCreated: false
+        },
+        {
+          id: 'not-04',
+          title: 'Annual Inter-College University Sports Meet "Udaan 2026"',
+          category: 'General',
+          date: '2026-03-15',
+          content: 'Nominations are invited for track events, badminton, cricket, and volleyball championships. Interested participants can consult college sports coordinators.',
+          isUserCreated: false
+        }
+      ],
+
+      defaultExams: [
+        { code: 'BCA-401', subject: 'Computer Graphics & Multimedia', date: '2026-05-18', time: '10:00 AM - 01:00 PM', shift: 'Morning', course: 'BCA' },
+        { code: 'BCA-402', subject: 'Operating Systems & Linux Shell', date: '2026-05-21', time: '10:00 AM - 01:00 PM', shift: 'Morning', course: 'BCA' },
+        { code: 'BCA-403', subject: 'Software Engineering Principles', date: '2026-05-24', time: '10:00 AM - 01:00 PM', shift: 'Morning', course: 'BCA' },
+        { code: 'BCA-404', subject: 'Web Technologies (JS & Modern UI)', date: '2026-05-27', time: '10:00 AM - 01:00 PM', shift: 'Morning', course: 'BCA' }
+      ],
+
+      defaultResults: [
+        {
+          roll: '21098101',
+          name: 'Raj Gautam',
+          course: 'BCA',
+          semester: 3,
+          marks: [
+            { subject: 'Data Structures using C', code: 'BCA-301', maxMarks: 100, obtained: 86 },
+            { subject: 'Database Management Systems', code: 'BCA-302', maxMarks: 100, obtained: 92 },
+            { subject: 'Java Programming', code: 'BCA-303', maxMarks: 100, obtained: 88 },
+            { subject: 'Discrete Mathematics', code: 'BCA-304', maxMarks: 100, obtained: 79 },
+            { subject: 'DBMS & Java Lab', code: 'BCA-305L', maxMarks: 100, obtained: 95 }
+          ]
+        },
+        {
+          roll: '21098102',
+          name: 'Demo Scholar',
+          course: 'BCA',
+          semester: 3,
+          marks: [
+            { subject: 'Data Structures using C', code: 'BCA-301', maxMarks: 100, obtained: 65 },
+            { subject: 'Database Management Systems', code: 'BCA-302', maxMarks: 100, obtained: 70 },
+            { subject: 'Java Programming', code: 'BCA-303', maxMarks: 100, obtained: 58 },
+            { subject: 'Discrete Mathematics', code: 'BCA-304', maxMarks: 100, obtained: 62 },
+            { subject: 'DBMS & Java Lab', code: 'BCA-305L', maxMarks: 100, obtained: 80 }
+          ]
+        }
+      ],
+
+      defaultAttendance: [
+        { id: 'att-1', subject: 'Computer Graphics', conducted: 36, attended: 32 },
+        { id: 'att-2', subject: 'Operating Systems', conducted: 40, attended: 34 },
+        { id: 'att-3', subject: 'Software Engineering', conducted: 32, attended: 22 },
+        { id: 'att-4', subject: 'Web Technologies', conducted: 38, attended: 36 }
+      ],
+
+      defaultCourses: [
+        { code: 'BCA', name: 'Bachelor of Computer Applications', faculty: 'Computer Applications', level: 'UG', duration: '3 Years (6 Semesters)', subjects: ['C/C++', 'Data Structures', 'DBMS', 'Web Design', 'Java', 'Python'] },
+        { code: 'BTECH-CS', name: 'B.Tech in Computer Science & Engineering', faculty: 'Engineering & Tech', level: 'UG', duration: '4 Years (8 Semesters)', subjects: ['Digital Logic', 'Algorithms', 'AI/ML', 'Computer Architecture', 'Cloud'] },
+        { code: 'MCA', name: 'Master of Computer Applications', faculty: 'Computer Applications', level: 'PG', duration: '2 Years (4 Semesters)', subjects: ['Advanced Algorithms', 'Distributed Systems', 'Neural Networks', 'DevOps'] },
+        { code: 'MSC-MATH', name: 'M.Sc. in Mathematics', faculty: 'Science', level: 'PG', duration: '2 Years (4 Semesters)', subjects: ['Real Analysis', 'Topology', 'Fluid Dynamics', 'Differential Equations'] },
+        { code: 'MBA', name: 'Master of Business Administration', faculty: 'Management Studies', level: 'PG', duration: '2 Years (4 Semesters)', subjects: ['Financial Management', 'Marketing Analytics', 'HR Strategy'] }
+      ],
+
+      defaultBooks: [
+        { title: 'Data Structures Through C in Depth', author: 'S.K. Srivastava', category: 'Computer Science', available: true, rack: 'Shelf CS-03' },
+        { title: 'Database System Concepts', author: 'Silberschatz, Korth, Sudarshan', category: 'Computer Science', available: true, rack: 'Shelf CS-08' },
+        { title: 'Operating System Concepts', author: 'Abraham Silberschatz', category: 'Computer Science', available: false, rack: 'Issued (Due May 10)' },
+        { title: 'Discrete Mathematics and Its Applications', author: 'Kenneth H. Rosen', category: 'Mathematics', available: true, rack: 'Shelf M-02' }
+      ]
+    };
+
+    /* ==========================================================================
+       Storage Manager (Safe Namespaced LocalStorage)
+       ========================================================================== */
+    const StorageManager = {
+      prefix: 'vbspu_connect_',
+
+      get(key, fallback) {
+        try {
+          const item = localStorage.getItem(this.prefix + key);
+          return item ? JSON.parse(item) : fallback;
+        } catch (e) {
+          console.warn('Storage read error for key:', key, e);
+          return fallback;
+        }
+      },
+
+      set(key, val) {
+        try {
+          localStorage.setItem(this.prefix + key, JSON.stringify(val));
+        } catch (e) {
+          console.error('Storage write error for key:', key, e);
+        }
+      },
+
+      init() {
+        if (!this.get('notices', null)) {
+          this.set('notices', DataRepository.defaultNotices);
+        }
+        if (!this.get('attendance', null)) {
+          this.set('attendance', DataRepository.defaultAttendance);
+        }
+      },
+
+      exportJSON() {
+        const payload = {
+          profile: this.get('profile', { name: 'Raj Gautam', roll: '21098101' }),
+          attendance: this.get('attendance', DataRepository.defaultAttendance),
+          customNotices: this.get('notices', []).filter(n => n.isUserCreated),
+          timestamp: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `VBSPU_Connect_UserData_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        NotificationService.show('Personal data exported to JSON file.', 'success');
+      },
+
+      resetAllData() {
+        if (confirm('Are you sure you want to reset all stored demo preferences and local changes?')) {
+          localStorage.clear();
+          StorageManager.init();
+          NotificationService.show('All local demo storage has been restored to factory defaults.', 'warning');
+          setTimeout(() => location.reload(), 800);
+        }
+      }
+    };
+
+    /* ==========================================================================
+       Notification Service (Toast System)
+       ========================================================================== */
+    const NotificationService = {
+      container: document.getElementById('toastContainer'),
+
+      show(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        const textSpan = document.createElement('span');
+        textSpan.textContent = message;
+        toast.appendChild(textSpan);
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '✕';
+        closeBtn.style.color = 'var(--text-muted)';
+        closeBtn.onclick = () => toast.remove();
+        toast.appendChild(closeBtn);
+
+        this.container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(8px)';
+          setTimeout(() => toast.remove(), 250);
+        }, 4000);
+      }
+    };
+
+    /* ==========================================================================
+       Router & Navigation Controller
+       ========================================================================== */
+    const AppRouter = {
+      currentView: 'home',
+      navItems: [
+        { id: 'home', label: 'Home', icon: '🏛️' },
+        { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+        { id: 'notices', label: 'Notices', icon: '📌' },
+        { id: 'courses', label: 'Courses', icon: '🎓' },
+        { id: 'examinations', label: 'Examinations', icon: '🗓️' },
+        { id: 'results', label: 'Results', icon: '📜' },
+        { id: 'attendance', label: 'Attendance', icon: '📈' },
+        { id: 'fees', label: 'Fee Planner', icon: '💰' },
+        { id: 'library', label: 'Library', icon: '📚' },
+        { id: 'profile', label: 'Profile & Settings', icon: '👤' },
+        { id: 'admin', label: 'Admin Demo', icon: '⚙️' },
+        { id: 'help', label: 'Help & FAQ', icon: '❓' },
+        { id: 'developer', label: 'About Developer', icon: '💻' }
+      ],
+
+      init() {
+        this.renderDrawer();
+        window.addEventListener('popstate', (e) => {
+          const view = (e.state && e.state.view) || 'home';
+          this.navigate(view, false);
+        });
+        const initial = location.hash.replace('#', '') || 'home';
+        this.navigate(initial, false);
+      },
+
+      renderDrawer() {
+        const list = document.getElementById('drawerNavList');
+        list.innerHTML = '';
+        this.navItems.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'drawer-nav-item';
+          
+          const btn = document.createElement('button');
+          btn.className = 'drawer-nav-btn';
+          btn.id = `nav-btn-${item.id}`;
+          btn.innerHTML = `<span aria-hidden="true">${item.icon}</span> <span>${item.label}</span>`;
+          btn.onclick = () => {
+            this.navigate(item.id);
+            AppLayout.toggleDrawer(false);
+          };
+          
+          li.appendChild(btn);
+          list.appendChild(li);
+        });
+      },
+
+      navigate(viewId, pushHistory = true) {
+        if (!document.getElementById(`view-${viewId}`)) {
+          viewId = 'home';
+        }
+
+        document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.drawer-nav-btn').forEach(b => b.classList.remove('active'));
+
+        const target = document.getElementById(`view-${viewId}`);
+        if (target) target.classList.add('active');
+
+        const activeNavBtn = document.getElementById(`nav-btn-${viewId}`);
+        if (activeNavBtn) activeNavBtn.classList.add('active');
+
+        this.currentView = viewId;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        if (pushHistory) {
+          history.pushState({ view: viewId }, '', `#${viewId}`);
+        }
+
+        // Trigger view-specific renderers
+        this.notifyViewActive(viewId);
+      },
+
+      notifyViewActive(viewId) {
+        switch (viewId) {
+          case 'home': HomeView.render(); break;
+          case 'dashboard': DashboardView.render(); break;
+          case 'notices': NoticeView.render(); break;
+          case 'courses': CourseView.render(); break;
+          case 'examinations': ExamView.render(); break;
+          case 'attendance': AttendanceView.render(); break;
+          case 'library': LibraryView.render(); break;
+          case 'fees': FeeView.calculate(); break;
+          case 'admin': AdminView.render(); break;
+          case 'help': HelpView.render(); break;
+        }
+      }
+    };
+
+    /* ==========================================================================
+       Layout Manager
+       ========================================================================== */
+    const AppLayout = {
+      isDrawerOpen: false,
+
+      toggleDrawer(open) {
+        this.isDrawerOpen = typeof open === 'boolean' ? open : !this.isDrawerOpen;
+        document.getElementById('navDrawer').classList.toggle('active', this.isDrawerOpen);
+        document.getElementById('drawerOverlay').classList.toggle('active', this.isDrawerOpen);
+      }
+    };
+
+    /* ==========================================================================
+       Theme & Accessibility Manager
+       ========================================================================== */
+    const ThemeManager = {
+      init() {
+        const theme = StorageManager.get('theme', 'dark');
+        const reduced = StorageManager.get('reduced_motion', false);
+        this.setTheme(theme, false);
+        this.setReducedMotion(reduced, false);
+      },
+
+      setTheme(theme, save = true) {
+        document.documentElement.setAttribute('data-theme', theme);
+        const sel = document.getElementById('settingTheme');
+        if (sel) sel.value = theme;
+        if (save) {
+          StorageManager.set('theme', theme);
+          NotificationService.show(`Color theme updated to ${theme} mode.`, 'info');
+        }
+      },
+
+      setReducedMotion(enabled, save = true) {
+        document.documentElement.setAttribute('data-reduced-motion', enabled ? 'true' : 'false');
+        const sel = document.getElementById('settingMotion');
+        if (sel) sel.value = enabled.toString();
+        if (save) {
+          StorageManager.set('reduced_motion', enabled);
+          NotificationService.show(`Motion preferences saved.`, 'info');
+        }
+      }
+    };
+
+    /* ==========================================================================
+       View: Home
+       ========================================================================== */
+    const HomeView = {
+      render() {
+        this.renderRecentNotices();
+        this.renderUpcomingExams();
+        this.renderFaculties();
+      },
+
+      renderRecentNotices() {
+        const notices = StorageManager.get('notices', DataRepository.defaultNotices).slice(0, 3);
+        const container = document.getElementById('homeRecentNotices');
+        container.innerHTML = '';
+        notices.forEach(n => {
+          const div = document.createElement('div');
+          div.style.padding = '8px 0';
+          div.style.borderBottom = '1px solid var(--border-subtle)';
+          div.innerHTML = `
+            <div style="font-size:0.75rem; color:var(--text-muted);">${n.date} · <span class="tag tag-exam">${n.category}</span></div>
+            <div style="font-weight:600; font-size:0.86rem; margin-top:2px;">
+              <a href="javascript:void(0)" onclick="NoticeView.openDetailModal('${n.id}')">${this.escape(n.title)}</a>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      },
+
+      renderUpcomingExams() {
+        const exams = DataRepository.defaultExams.slice(0, 3);
+        const container = document.getElementById('homeUpcomingExams');
+        container.innerHTML = '';
+        exams.forEach(e => {
+          const div = document.createElement('div');
+          div.style.padding = '8px 0';
+          div.style.borderBottom = '1px solid var(--border-subtle)';
+          div.innerHTML = `
+            <div style="font-size:0.75rem; color:var(--accent-secondary); font-weight:600;">${e.date} (${e.shift})</div>
+            <div style="font-size:0.86rem; font-weight:600;">${this.escape(e.subject)}</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">${e.code}</div>
+          `;
+          container.appendChild(div);
+        });
+      },
+
+      renderFaculties() {
+        const container = document.getElementById('homeFacultiesGrid');
+        container.innerHTML = `
+          <div style="background:var(--bg-base); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <h4>💻 Computer Applications</h4>
+            <span style="font-size:0.78rem; color:var(--text-muted);">BCA, MCA, PGDCA</span>
+          </div>
+          <div style="background:var(--bg-base); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <h4>⚙️ Engineering & Tech</h4>
+            <span style="font-size:0.78rem; color:var(--text-muted);">B.Tech, M.Tech</span>
+          </div>
+          <div style="background:var(--bg-base); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <h4>🔬 Science & Life Sciences</h4>
+            <span style="font-size:0.78rem; color:var(--text-muted);">B.Sc., M.Sc., Biotech</span>
+          </div>
+          <div style="background:var(--bg-base); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <h4>📊 Management & Commerce</h4>
+            <span style="font-size:0.78rem; color:var(--text-muted);">BBA, MBA, B.Com</span>
+          </div>
+        `;
+      },
+
+      escape(str) {
+        return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+      }
+    };
+
+    /* ==========================================================================
+       View: Dashboard
+       ========================================================================== */
+    const DashboardView = {
+      render() {
+        const attendance = StorageManager.get('attendance', DataRepository.defaultAttendance);
+        const totalConducted = attendance.reduce((acc, curr) => acc + curr.conducted, 0);
+        const totalAttended = attendance.reduce((acc, curr) => acc + curr.attended, 0);
+        const overallAttPct = totalConducted > 0 ? Math.round((totalAttended / totalConducted) * 100) : 0;
+
+        const statsRow = document.getElementById('dashboardStatsRow');
+        statsRow.innerHTML = `
+          <div class="panel" style="margin:0;">
+            <div style="color:var(--text-muted); font-size:0.8rem;">Overall Attendance</div>
+            <div style="font-size:1.8rem; font-weight:800; color:${overallAttPct >= 75 ? 'var(--accent-success)' : 'var(--accent-danger)'};">${overallAttPct}%</div>
+            <span style="font-size:0.72rem; color:var(--text-muted);">${totalAttended}/${totalConducted} classes attended</span>
+          </div>
+          <div class="panel" style="margin:0;">
+            <div style="color:var(--text-muted); font-size:0.8rem;">Registered Courses</div>
+            <div style="font-size:1.8rem; font-weight:800; color:var(--accent-secondary);">5 Subjects</div>
+            <span style="font-size:0.72rem; color:var(--text-muted);">4 Theory + 1 Lab Session</span>
+          </div>
+          <div class="panel" style="margin:0;">
+            <div style="color:var(--text-muted); font-size:0.8rem;">Next Examination</div>
+            <div style="font-size:1.8rem; font-weight:800; color:var(--accent-gold);">May 18</div>
+            <span style="font-size:0.72rem; color:var(--text-muted);">BCA-401 Comp Graphics</span>
+          </div>
+          <div class="panel" style="margin:0;">
+            <div style="color:var(--text-muted); font-size:0.8rem;">Current Academic SGPA</div>
+            <div style="font-size:1.8rem; font-weight:800; color:var(--accent-primary);">8.80</div>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Previous Sem Aggregate</span>
+          </div>
+        `;
+
+        // Attendance preview
+        const attContainer = document.getElementById('dashboardAttendancePreview');
+        attContainer.innerHTML = '';
+        attendance.forEach(a => {
+          const pct = Math.round((a.attended / a.conducted) * 100);
+          const bar = document.createElement('div');
+          bar.style.marginBottom = '12px';
+          bar.innerHTML = `
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+              <span>${a.subject}</span>
+              <strong>${pct}% (${a.attended}/${a.conducted})</strong>
+            </div>
+            <div style="height:6px; background:var(--bg-base); border-radius:var(--radius-full); overflow:hidden;">
+              <div style="height:100%; width:${pct}%; background:${pct >= 75 ? 'var(--accent-success)' : 'var(--accent-danger)'};"></div>
+            </div>
+          `;
+          attContainer.appendChild(bar);
+        });
+
+        // Assignment tracker
+        const assignList = document.getElementById('dashboardAssignmentList');
+        assignList.innerHTML = `
+          <div style="padding:10px 0; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:0.86rem; font-weight:600;">Computer Graphics Clipping Algorithm</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Due: April 25 · Cohen-Sutherland Implementation</div>
+            </div>
+            <span class="tag tag-exam">Pending</span>
+          </div>
+          <div style="padding:10px 0; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:0.86rem; font-weight:600;">Linux Bash Automation Scripts</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Due: May 02 · 10 practical questions</div>
+            </div>
+            <span class="tag tag-acad">Submitted</span>
+          </div>
+        `;
+
+        // Activity timeline
+        const timeline = document.getElementById('dashboardActivityTimeline');
+        timeline.innerHTML = `
+          <div style="margin-bottom:14px; position:relative;">
+            <div style="font-size:0.78rem; color:var(--accent-secondary); font-weight:600;">Today</div>
+            <div style="font-size:0.86rem; font-weight:500;">Attended Web Technologies Lecture & Lab (BCA-404)</div>
+          </div>
+          <div style="margin-bottom:14px; position:relative;">
+            <div style="font-size:0.78rem; color:var(--text-muted);">Yesterday</div>
+            <div style="font-size:0.86rem; font-weight:500;">Saved "Operating System Concepts" to Reading List</div>
+          </div>
+          <div>
+            <div style="font-size:0.78rem; color:var(--text-muted);">3 days ago</div>
+            <div style="font-size:0.86rem; font-weight:500;">Checked Semester III Results marksheet breakdown</div>
+          </div>
+        `;
+      }
+    };
+
+    /* ==========================================================================
+       View: Notices & Announcements
+       ========================================================================== */
+    const NoticeView = {
+      render() {
+        this.applyFilters();
+      },
+
+      applyFilters() {
+        const query = (document.getElementById('noticeSearchInput')?.value || '').toLowerCase();
+        const category = document.getElementById('noticeCategoryFilter')?.value || 'all';
+        const sort = document.getElementById('noticeSortFilter')?.value || 'newest';
+
+        let notices = StorageManager.get('notices', DataRepository.defaultNotices);
+
+        if (category !== 'all') {
+          notices = notices.filter(n => n.category === category);
+        }
+
+        if (query) {
+          notices = notices.filter(n => n.title.toLowerCase().includes(query) || n.content.toLowerCase().includes(query));
+        }
+
+        notices.sort((a, b) => {
+          return sort === 'newest' ? new Date(b.date) - new Date(a.date) : new Date(a.date) - new Date(b.date);
+        });
+
+        const container = document.getElementById('noticesListContainer');
+        container.innerHTML = '';
+
+        if (notices.length === 0) {
+          container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-muted);">No circulars found matching your criteria.</div>';
+          return;
+        }
+
+        notices.forEach(n => {
+          const card = document.createElement('div');
+          card.className = 'panel';
+          card.style.margin = '0';
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px;">
+              <span class="tag tag-${this.getCategoryClass(n.category)}">${n.category}</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);">${n.date}</span>
+            </div>
+            <h3 style="font-size:1rem; margin-bottom:8px;">${HomeView.escape(n.title)}</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">
+              ${HomeView.escape(n.content)}
+            </p>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <button class="btn btn-secondary btn-sm" onclick="NoticeView.openDetailModal('${n.id}')">Read Full Notice</button>
+              ${n.isUserCreated ? `<button class="btn btn-danger btn-sm" onclick="NoticeView.deleteNotice('${n.id}')">Delete</button>` : ''}
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      },
+
+      getCategoryClass(cat) {
+        switch (cat) {
+          case 'Examination': return 'exam';
+          case 'Admission': return 'adm';
+          case 'Academic': return 'acad';
+          case 'Scholarship': return 'sch';
+          default: return 'exam';
+        }
+      },
+
+      openDetailModal(id) {
+        const notices = StorageManager.get('notices', DataRepository.defaultNotices);
+        const notice = notices.find(n => n.id === id);
+        if (!notice) return;
+
+        document.getElementById('noticeModalTitle').textContent = notice.title;
+        const body = document.getElementById('noticeModalBody');
+        body.innerHTML = `
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <span class="tag tag-acad">${notice.category}</span>
+            <span style="font-size:0.8rem; color:var(--text-muted);">Published: ${notice.date}</span>
+          </div>
+          <div style="font-size:0.92rem; line-height:1.6; color:var(--text-main); margin-bottom:20px;">
+            ${HomeView.escape(notice.content)}
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary btn-sm" onclick="NoticeView.copyText('${notice.id}')">Copy Text</button>
+            <button class="btn btn-primary btn-sm" onclick="NoticeView.closeModal()">Close</button>
+          </div>
+        `;
+        document.getElementById('noticeModal').classList.add('active');
+      },
+
+      closeModal() {
+        document.getElementById('noticeModal').classList.remove('active');
+      },
+
+      handleBackdropClick(e) {
+        if (e.target.id === 'noticeModal') this.closeModal();
+      },
+
+      copyText(id) {
+        const notices = StorageManager.get('notices', DataRepository.defaultNotices);
+        const notice = notices.find(n => n.id === id);
+        if (!notice) return;
+        navigator.clipboard.writeText(`${notice.title}\n\n${notice.content}`).then(() => {
+          NotificationService.show('Notice text copied to clipboard.', 'success');
+        });
+      },
+
+      openCreateModal() {
+        document.getElementById('noticeModalTitle').textContent = 'Create Local Demo Notice';
+        const body = document.getElementById('noticeModalBody');
+        body.innerHTML = `
+          <form onsubmit="NoticeView.handleCreate(event)">
+            <div class="form-group">
+              <label>Notice Title</label>
+              <input type="text" id="newNoticeTitle" class="form-control" required placeholder="e.g. Schedule for Practical Viva">
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <select id="newNoticeCategory" class="form-control">
+                <option value="Academic">Academic</option>
+                <option value="Examination">Examination</option>
+                <option value="Admission">Admission</option>
+                <option value="Scholarship">Scholarship</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Notice Content</label>
+              <textarea id="newNoticeContent" class="form-control" rows="4" required placeholder="Enter full notification body..."></textarea>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:16px;">
+              <button type="submit" class="btn btn-primary">Publish Demo Notice</button>
+              <button type="button" class="btn btn-secondary" onclick="NoticeView.closeModal()">Cancel</button>
+            </div>
+          </form>
+        `;
+        document.getElementById('noticeModal').classList.add('active');
+      },
+
+      handleCreate(e) {
+        e.preventDefault();
+        const title = document.getElementById('newNoticeTitle').value.trim();
+        const category = document.getElementById('newNoticeCategory').value;
+        const content = document.getElementById('newNoticeContent').value.trim();
+
+        if (!title || !content) return;
+
+        const notices = StorageManager.get('notices', DataRepository.defaultNotices);
+        const newNotice = {
+          id: 'usr-not-' + Date.now(),
+          title,
+          category,
+          content,
+          date: new Date().toISOString().split('T')[0],
+          isUserCreated: true
+        };
+
+        notices.unshift(newNotice);
+        StorageManager.set('notices', notices);
+        this.closeModal();
+        this.applyFilters();
+        NotificationService.show('Demo notice saved locally.', 'success');
+      },
+
+      deleteNotice(id) {
+        if (!confirm('Delete this user-created notice?')) return;
+        let notices = StorageManager.get('notices', DataRepository.defaultNotices);
+        notices = notices.filter(n => n.id !== id);
+        StorageManager.set('notices', notices);
+        this.applyFilters();
+        NotificationService.show('Notice deleted.', 'info');
+      }
+    };
+
+    /* ==========================================================================
+       View: Course Catalog
+       ========================================================================== */
+    const CourseView = {
+      render() {
+        this.applyFilters();
+      },
+
+      applyFilters() {
+        const query = (document.getElementById('courseSearchInput')?.value || '').toLowerCase();
+        const faculty = document.getElementById('courseFacultyFilter')?.value || 'all';
+        const level = document.getElementById('courseLevelFilter')?.value || 'all';
+
+        let courses = DataRepository.defaultCourses;
+
+        if (faculty !== 'all') {
+          courses = courses.filter(c => c.faculty === faculty);
+        }
+        if (level !== 'all') {
+          courses = courses.filter(c => c.level === level);
+        }
+        if (query) {
+          courses = courses.filter(c => c.name.toLowerCase().includes(query) || c.code.toLowerCase().includes(query));
+        }
+
+        const container = document.getElementById('coursesGridContainer');
+        container.innerHTML = '';
+
+        courses.forEach(c => {
+          const card = document.createElement('div');
+          card.className = 'panel';
+          card.style.margin = '0';
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="tag tag-acad">${c.level}</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);">${c.duration}</span>
+            </div>
+            <h3 style="font-size:1.05rem; margin-bottom:4px;">${HomeView.escape(c.name)}</h3>
+            <div style="font-size:0.8rem; color:var(--accent-secondary); margin-bottom:12px;">${c.code} · ${c.faculty}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
+              <strong>Key Curriculum:</strong> ${c.subjects.join(', ')}
+            </div>
+            <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="NotificationService.show('Syllabus PDF downloads are linked to approved university repositories.', 'info')">Download Syllabus (PDF)</button>
+          `;
+          container.appendChild(card);
+        });
+      }
+    };
+
+    /* ==========================================================================
+       View: Examination Centre
+       ========================================================================== */
+    const ExamView = {
+      render() {
+        const tbody = document.getElementById('examTimetableBody');
+        tbody.innerHTML = '';
+
+        DataRepository.defaultExams.forEach(e => {
+          const examDate = new Date(e.date + 'T10:00:00');
+          const now = new Date();
+          const diffDays = Math.ceil((examDate - now) / (1000 * 60 * 60 * 24));
+          const countdown = diffDays > 0 ? `${diffDays} days left` : 'Completed';
+
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid var(--border-subtle)';
+          tr.innerHTML = `
+            <td style="padding:10px;"><strong>${e.date}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">${e.time}</span></td>
+            <td style="padding:10px;">${e.course}</td>
+            <td style="padding:10px;"><span class="tag">${e.code}</span></td>
+            <td style="padding:10px; font-weight:600;">${HomeView.escape(e.subject)}</td>
+            <td style="padding:10px;">${e.shift}</td>
+            <td style="padding:10px;"><strong style="color:var(--accent-gold); font-size:0.82rem;">${countdown}</strong></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Checklist
+        const checkContainer = document.getElementById('examChecklistContainer');
+        checkContainer.innerHTML = `
+          <label style="display:flex; align-items:center; gap:8px; font-size:0.88rem; cursor:pointer;">
+            <input type="checkbox" checked> Print official VBSPU Admit Card with registered photo
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:0.88rem; cursor:pointer;">
+            <input type="checkbox" checked> Carry College Identity Card and Aadhaar verification
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:0.88rem; cursor:pointer;">
+            <input type="checkbox"> Transparent stationery pouch with approved non-programmable instruments
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:0.88rem; cursor:pointer;">
+            <input type="checkbox"> Check assigned examination center code 48 hours prior
+          </label>
+        `;
+      },
+
+      exportCSV() {
+        let csv = 'Date,Time,Course,Paper Code,Subject,Shift\n';
+        DataRepository.defaultExams.forEach(e => {
+          csv += `"${e.date}","${e.time}","${e.course}","${e.code}","${e.subject}","${e.shift}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `VBSPU_Exam_Timetable_${Date.now()}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        NotificationService.show('Timetable exported to CSV format.', 'success');
+      }
+    };
+
+    /* ==========================================================================
+       View: Results & Marksheet
+       ========================================================================== */
+    const ResultView = {
+      handleSearch(e) {
+        e.preventDefault();
+        const roll = document.getElementById('resRoll').value.trim();
+        const course = document.getElementById('resCourse').value;
+        const sem = parseInt(document.getElementById('resSem').value);
+
+        const record = DataRepository.defaultResults.find(r => r.roll === roll && r.course === course && r.semester === sem);
+        const out = document.getElementById('resultOutputContainer');
+
+        if (!record) {
+          out.innerHTML = `
+            <div class="panel" style="text-align:center; padding:30px;">
+              <h3 style="color:var(--accent-warning); margin-bottom:8px;">No Sample Record Found</h3>
+              <p style="font-size:0.88rem; color:var(--text-muted);">No demo mark entry matches Roll "${HomeView.escape(roll)}" for ${course} Semester ${sem}. Try demo roll <strong>21098101</strong>.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Calculations
+        let totalMax = 0;
+        let totalObt = 0;
+        record.marks.forEach(m => {
+          totalMax += m.maxMarks;
+          totalObt += m.obtained;
+        });
+
+        const pct = totalMax > 0 ? ((totalObt / totalMax) * 100).toFixed(1) : 0;
+        let grade = 'F';
+        let isPass = true;
+
+        if (pct >= 85) grade = 'A+ (Distinction)';
+        else if (pct >= 75) grade = 'A (First Class)';
+        else if (pct >= 60) grade = 'B (High Second)';
+        else if (pct >= 50) grade = 'C (Pass)';
+        else { grade = 'F'; isPass = false; }
+
+        out.innerHTML = `
+          <div class="panel" style="border:2px solid var(--accent-secondary);">
+            <div style="text-align:center; border-bottom:1px solid var(--border-subtle); padding-bottom:12px; margin-bottom:14px;">
+              <div class="demo-badge" style="margin-bottom:6px;">DEMO — NOT AN OFFICIAL UNIVERSITY DOCUMENT</div>
+              <h3 style="font-size:1.2rem;">Veer Bahadur Singh Purvanchal University, Jaunpur</h3>
+              <span style="font-size:0.85rem; color:var(--text-muted);">Provisional Statement of Marks (Demonstration Preview)</span>
+            </div>
+
+            <div class="grid-2" style="font-size:0.85rem; margin-bottom:14px; background:var(--bg-surface-elevated); padding:12px; border-radius:var(--radius-md);">
+              <div>
+                <div>Candidate Name: <strong>${HomeView.escape(record.name)}</strong></div>
+                <div>Roll Number: <strong>${record.roll}</strong></div>
+              </div>
+              <div>
+                <div>Course: <strong>${record.course} (Semester ${record.semester})</strong></div>
+                <div>Status: <strong style="color:${isPass ? 'var(--accent-success)' : 'var(--accent-danger)'};">${isPass ? 'PASSED' : 'FAILED'}</strong></div>
+              </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.88rem; margin-bottom:16px;">
+                <thead>
+                  <tr style="border-bottom:2px solid var(--border-subtle); color:var(--text-muted); text-align:left;">
+                    <th style="padding:8px;">Code</th>
+                    <th style="padding:8px;">Subject Paper</th>
+                    <th style="padding:8px;">Max</th>
+                    <th style="padding:8px;">Obtained</th>
+                    <th style="padding:8px;">Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${record.marks.map(m => `
+                    <tr style="border-bottom:1px solid var(--border-subtle);">
+                      <td style="padding:8px;"><span class="tag">${m.code}</span></td>
+                      <td style="padding:8px;">${m.subject}</td>
+                      <td style="padding:8px;">${m.maxMarks}</td>
+                      <td style="padding:8px; font-weight:700;">${m.obtained}</td>
+                      <td style="padding:8px;">${m.obtained >= 40 ? 'P' : 'F'}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; background:var(--bg-base); padding:12px; border-radius:var(--radius-md);">
+              <div>Aggregate Marks: <strong>${totalObt} / ${totalMax}</strong></div>
+              <div>Percentage: <strong>${pct}%</strong></div>
+              <div>Illustrative Grade: <strong style="color:var(--accent-gold);">${grade}</strong></div>
+            </div>
+
+            <div style="margin-top:14px; display:flex; gap:10px;">
+              <button class="btn btn-secondary btn-sm" onclick="window.print()">Print Marksheet Preview</button>
+            </div>
+          </div>
+        `;
+      },
+
+      loadDemoSample() {
+        document.getElementById('resRoll').value = '21098101';
+        document.getElementById('resCourse').value = 'BCA';
+        document.getElementById('resSem').value = '3';
+        this.handleSearch(new Event('submit'));
+      }
+    };
+
+    /* ==========================================================================
+       View: Attendance Tracker
+       ========================================================================== */
+    const AttendanceView = {
+      render() {
+        const attendance = StorageManager.get('attendance', DataRepository.defaultAttendance);
+        const tbody = document.getElementById('attendanceTableBody');
+        tbody.innerHTML = '';
+
+        let totalCond = 0;
+        let totalAtt = 0;
+
+        attendance.forEach(a => {
+          totalCond += a.conducted;
+          totalAtt += a.attended;
+          const pct = a.conducted > 0 ? Math.round((a.attended / a.conducted) * 100) : 0;
+          const isSafe = pct >= 75;
+
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid var(--border-subtle)';
+          tr.innerHTML = `
+            <td style="padding:10px; font-weight:600;">${HomeView.escape(a.subject)}</td>
+            <td style="padding:10px;">${a.attended}</td>
+            <td style="padding:10px;">${a.conducted}</td>
+            <td style="padding:10px; font-weight:700; color:${isSafe ? 'var(--accent-success)' : 'var(--accent-danger)'};">${pct}%</td>
+            <td style="padding:10px;">
+              <span class="tag ${isSafe ? 'tag-acad' : 'tag-exam'}">${isSafe ? 'Satisfactory' : 'Shortage'}</span>
+            </td>
+            <td style="padding:10px;">
+              <button class="btn btn-secondary btn-sm" onclick="AttendanceView.quickLog('${a.id}', 1, 1)">+ Present</button>
+              <button class="btn btn-secondary btn-sm" onclick="AttendanceView.quickLog('${a.id}', 0, 1)">+ Absent</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        const overallPct = totalCond > 0 ? Math.round((totalAtt / totalCond) * 100) : 0;
+        const summaryCards = document.getElementById('attendanceSummaryCards');
+        summaryCards.innerHTML = `
+          <div class="panel" style="margin:0;">
+            <div style="color:var(--text-muted); font-size:0.8rem;">Calculated Average</div>
+            <div style="font-size:2rem; font-weight:800; color:${overallPct >= 75 ? 'var(--accent-success)' : 'var(--accent-danger)'};">${overallPct}%</div>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Threshold: 75% required</span>
+          </div>
+          <div class="panel" style="margin:0;">
+            <div style="color:var(--text-muted); font-size:0.8rem;">Total Classes Conducted</div>
+            <div style="font-size:2rem; font-weight:800; color:var(--text-main);">${totalCond}</div>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Across registered modules</span>
+          </div>
+          <div class="panel" style="margin:0;">
+            <div style="color:var(--text-muted); font-size:0.8rem;">Total Present</div>
+            <div style="font-size:2rem; font-weight:800; color:var(--accent-secondary);">${totalAtt}</div>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Logged attendance</span>
+          </div>
+        `;
+      },
+
+      quickLog(id, addAtt, addCond) {
+        let attendance = StorageManager.get('attendance', DataRepository.defaultAttendance);
+        const record = attendance.find(a => a.id === id);
+        if (!record) return;
+
+        record.attended += addAtt;
+        record.conducted += addCond;
+        StorageManager.set('attendance', attendance);
+        this.render();
+        NotificationService.show(`Logged class for ${record.subject}.`, 'info');
+      },
+
+      openAddModal() {
+        document.getElementById('noticeModalTitle').textContent = 'Add Attendance Subject';
+        const body = document.getElementById('noticeModalBody');
+        body.innerHTML = `
+          <form onsubmit="AttendanceView.handleAdd(event)">
+            <div class="form-group">
+              <label>Subject Name</label>
+              <input type="text" id="attNewSub" class="form-control" required placeholder="e.g. Artificial Intelligence">
+            </div>
+            <div class="form-group">
+              <label>Classes Attended</label>
+              <input type="number" id="attNewAtt" class="form-control" value="0" min="0" required>
+            </div>
+            <div class="form-group">
+              <label>Classes Conducted</label>
+              <input type="number" id="attNewCond" class="form-control" value="0" min="0" required>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:14px;">
+              <button type="submit" class="btn btn-primary">Save Subject</button>
+              <button type="button" class="btn btn-secondary" onclick="NoticeView.closeModal()">Cancel</button>
+            </div>
+          </form>
+        `;
+        document.getElementById('noticeModal').classList.add('active');
+      },
+
+      handleAdd(e) {
+        e.preventDefault();
+        const sub = document.getElementById('attNewSub').value.trim();
+        const att = parseInt(document.getElementById('attNewAtt').value);
+        const cond = parseInt(document.getElementById('attNewCond').value);
+
+        if (!sub || cond < att) {
+          NotificationService.show('Conducted classes must be equal or greater than attended.', 'danger');
+          return;
+        }
+
+        const attendance = StorageManager.get('attendance', DataRepository.defaultAttendance);
+        attendance.push({
+          id: 'att-' + Date.now(),
+          subject: sub,
+          attended: att,
+          conducted: cond
+        });
+        StorageManager.set('attendance', attendance);
+        NoticeView.closeModal();
+        this.render();
+        NotificationService.show('New subject record added.', 'success');
+      }
+    };
+
+    /* ==========================================================================
+       View: Fee Calculator
+       ========================================================================== */
+    const FeeView = {
+      calculate() {
+        const tuition = parseFloat(document.getElementById('feeTuition')?.value) || 0;
+        const exam = parseFloat(document.getElementById('feeExam')?.value) || 0;
+        const lab = parseFloat(document.getElementById('feeLab')?.value) || 0;
+        const dev = parseFloat(document.getElementById('feeDev')?.value) || 0;
+        const paid = parseFloat(document.getElementById('feePaid')?.value) || 0;
+
+        const total = tuition + exam + lab + dev;
+        const balance = total - paid;
+
+        const fmt = val => '₹' + val.toLocaleString('en-IN');
+
+        document.getElementById('feeTotalDisplay').textContent = fmt(total);
+        document.getElementById('feePaidDisplay').textContent = fmt(paid);
+        document.getElementById('feeDueDisplay').textContent = fmt(Math.max(0, balance));
+      }
+    };
+
+    /* ==========================================================================
+       View: Library Catalogue
+       ========================================================================== */
+    const LibraryView = {
+      render() {
+        this.applyFilters();
+      },
+
+      applyFilters() {
+        const query = (document.getElementById('libSearchInput')?.value || '').toLowerCase();
+        const cat = document.getElementById('libCategoryFilter')?.value || 'all';
+
+        let books = DataRepository.defaultBooks;
+        if (cat !== 'all') books = books.filter(b => b.category === cat);
+        if (query) books = books.filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query));
+
+        const container = document.getElementById('libraryBooksContainer');
+        container.innerHTML = '';
+
+        books.forEach(b => {
+          const card = document.createElement('div');
+          card.className = 'panel';
+          card.style.margin = '0';
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="tag tag-acad">${b.category}</span>
+              <span class="tag ${b.available ? 'tag-acad' : 'tag-exam'}">${b.available ? 'In Stock' : 'Issued'}</span>
+            </div>
+            <h4 style="margin-bottom:4px; font-size:0.95rem;">${HomeView.escape(b.title)}</h4>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">By ${HomeView.escape(b.author)}</div>
+            <div style="font-size:0.75rem; color:var(--accent-secondary); margin-bottom:12px;">📍 ${b.rack}</div>
+            <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="NotificationService.show('Book reservation demo recorded.', 'info')">Reserve Copy</button>
+          `;
+          container.appendChild(card);
+        });
+      }
+    };
+
+    /* ==========================================================================
+       View: Profile & Settings
+       ========================================================================== */
+    const ProfileView = {
+      saveProfile(e) {
+        e.preventDefault();
+        const profile = {
+          name: document.getElementById('profName').value.trim(),
+          roll: document.getElementById('profRoll').value.trim(),
+          course: document.getElementById('profCourse').value.trim(),
+          college: document.getElementById('profCollege').value.trim()
+        };
+        StorageManager.set('profile', profile);
+        NotificationService.show('Student profile preferences updated locally.', 'success');
+      }
+    };
+
+    /* ==========================================================================
+       View: Admin Console
+       ========================================================================== */
+    const AdminView = {
+      render() {
+        const notices = StorageManager.get('notices', DataRepository.defaultNotices);
+        document.getElementById('adminNoticeCount').textContent = notices.length;
+        document.getElementById('adminCourseCount').textContent = DataRepository.defaultCourses.length;
+        document.getElementById('adminExamCount').textContent = DataRepository.defaultExams.length;
+
+        const tbody = document.getElementById('adminNoticesTableBody');
+        tbody.innerHTML = '';
+        notices.forEach(n => {
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid var(--border-subtle)';
+          tr.innerHTML = `
+            <td style="padding:8px; font-weight:600;">${HomeView.escape(n.title)}</td>
+            <td style="padding:8px;"><span class="tag">${n.category}</span></td>
+            <td style="padding:8px; font-size:0.8rem;">${n.date}</td>
+            <td style="padding:8px;">
+              ${n.isUserCreated ? `<button class="btn btn-danger btn-sm" onclick="NoticeView.deleteNotice('${n.id}'); AdminView.render();">Delete</button>` : `<span style="font-size:0.75rem; color:var(--text-muted);">Default Demo</span>`}
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    };
+
+    /* ==========================================================================
+       View: Help & FAQ
+       ========================================================================== */
+    const HelpView = {
+      faqs: [
+        { q: 'Is VBSPU Connect an official university portal?', a: 'No. This is an independent academic portfolio demonstration created by Raj Gautam (BCA Student). All student marks and timetable dates are illustrative demo data.' },
+        { q: 'Where are my attendance changes and notes stored?', a: 'Data is stored in your personal browser local storage (localStorage). It remains private to your device and is never uploaded to any remote server.' },
+        { q: 'Can I check real semester examination results here?', a: 'Real examination marks are officially maintained and published exclusively through the official university website (vbspu.ac.in). This prototype illustrates user interface and grading logic.' }
+      ],
+
+      render() {
+        const container = document.getElementById('helpFaqContainer');
+        container.innerHTML = '';
+        this.faqs.forEach(f => {
+          const div = document.createElement('div');
+          div.style.background = 'var(--bg-base)';
+          div.style.padding = '12px';
+          div.style.borderRadius = 'var(--radius-md)';
+          div.style.border = '1px solid var(--border-subtle)';
+          div.innerHTML = `
+            <div style="font-weight:700; font-size:0.9rem; margin-bottom:4px; color:var(--accent-secondary);">${f.q}</div>
+            <div style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;">${f.a}</div>
+          `;
+          container.appendChild(div);
+        });
+      }
+    };
+
+    /* ==========================================================================
+       Search Service (Global Portal Search)
+       ========================================================================== */
+    const SearchService = {
+      openSearchModal() {
+        document.getElementById('searchModal').classList.add('active');
+        const input = document.getElementById('globalSearchInput');
+        input.value = '';
+        input.focus();
+        document.getElementById('searchResultsList').innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding:20px;">Type anything to search...</div>';
+      },
+
+      closeSearchModal() {
+        document.getElementById('searchModal').classList.remove('active');
+      },
+
+      handleBackdropClick(e) {
+        if (e.target.id === 'searchModal') this.closeSearchModal();
+      },
+
+      executeSearch(query) {
+        query = query.trim().toLowerCase();
+        const out = document.getElementById('searchResultsList');
+
+        if (!query) {
+          out.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding:20px;">Type anything to search...</div>';
+          return;
+        }
+
+        const notices = StorageManager.get('notices', DataRepository.defaultNotices).filter(n => n.title.toLowerCase().includes(query));
+        const courses = DataRepository.defaultCourses.filter(c => c.name.toLowerCase().includes(query) || c.code.toLowerCase().includes(query));
+        const books = DataRepository.defaultBooks.filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query));
+
+        out.innerHTML = '';
+
+        if (notices.length === 0 && courses.length === 0 && books.length === 0) {
+          out.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding:20px;">No matching portal entities found.</div>';
+          return;
+        }
+
+        notices.forEach(n => {
+          const item = document.createElement('div');
+          item.style.padding = '8px 10px';
+          item.style.borderBottom = '1px solid var(--border-subtle)';
+          item.style.cursor = 'pointer';
+          item.innerHTML = `<span class="tag tag-exam">Notice</span> <strong>${HomeView.escape(n.title)}</strong>`;
+          item.onclick = () => {
+            SearchService.closeSearchModal();
+            AppRouter.navigate('notices');
+            NoticeView.openDetailModal(n.id);
+          };
+          out.appendChild(item);
+        });
+
+        courses.forEach(c => {
+          const item = document.createElement('div');
+          item.style.padding = '8px 10px';
+          item.style.borderBottom = '1px solid var(--border-subtle)';
+          item.style.cursor = 'pointer';
+          item.innerHTML = `<span class="tag tag-acad">Course</span> <strong>${c.code}</strong> — ${HomeView.escape(c.name)}`;
+          item.onclick = () => {
+            SearchService.closeSearchModal();
+            AppRouter.navigate('courses');
+          };
+          out.appendChild(item);
+        });
+
+        books.forEach(b => {
+          const item = document.createElement('div');
+          item.style.padding = '8px 10px';
+          item.style.borderBottom = '1px solid var(--border-subtle)';
+          item.style.cursor = 'pointer';
+          item.innerHTML = `<span class="tag">Library</span> <strong>${HomeView.escape(b.title)}</strong> (${HomeView.escape(b.author)})`;
+          item.onclick = () => {
+            SearchService.closeSearchModal();
+            AppRouter.navigate('library');
+          };
+          out.appendChild(item);
+        });
+      }
+    };
+
+    /* ==========================================================================
+       Global Keyboard Shortcuts & Application Boot
+       ========================================================================== */
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        SearchService.openSearchModal();
+      }
+      if (e.key === 'Escape') {
+        SearchService.closeSearchModal();
+        NoticeView.closeModal();
+        AppLayout.toggleDrawer(false);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      StorageManager.init();
+      ThemeManager.init();
+      AppRouter.init();
+    });
+  </script>
+</body>
+</html>
